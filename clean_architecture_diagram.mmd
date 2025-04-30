@@ -1,0 +1,53 @@
+graph TD
+    subgraph "External World"
+        REST["REST API\n(Primary Adapter)"]
+        DB["PostgreSQL Database\n(Secondary Adapter)"]
+        Providers["Utility Providers API\n(Secondary Adapter)"]
+        Cache["Redis Cache\n(Secondary Adapter)"]
+        CLI["CLI\n(Primary Adapter)"]
+    end
+    
+    subgraph "Application Core"
+        subgraph "Domain Layer"
+            Models["Domain Models\n- User\n- Bill\n- Provider\n- LinkedAccount"]
+            Services["Domain Services\n- AccountService\n- BillService"]
+        end
+        
+        subgraph "Primary Ports"
+            AccountPort["Account Service Interface"]
+            BillPort["Bill Service Interface"]
+        end
+        
+        subgraph "Secondary Ports"
+            RepoPort["Repository Interfaces\n- AccountRepository\n- BillRepository"]
+            ProviderPort["Provider Client Interface"]
+        end
+    end
+    
+    %% Connections between components
+    REST -->|uses| AccountPort
+    REST -->|uses| BillPort
+    CLI -->|uses| AccountPort
+    CLI -->|uses| BillPort
+    
+    AccountPort -->|implemented by| Services
+    BillPort -->|implemented by| Services
+    
+    Services -->|uses| RepoPort
+    Services -->|uses| ProviderPort
+    
+    RepoPort -->|implemented by| DB
+    ProviderPort -->|implemented by| Providers
+    ProviderPort -->|implemented by| Cache
+    
+    %% Domain relationships
+    Services -->|uses| Models
+    
+    %% Style
+    classDef core fill:#f9f,stroke:#333,stroke-width:2px;
+    classDef adapter fill:#bbf,stroke:#333,stroke-width:1px;
+    classDef port fill:#fdb,stroke:#333,stroke-width:1px;
+    
+    class Models,Services core;
+    class REST,DB,Providers,Cache,CLI adapter;
+    class AccountPort,BillPort,RepoPort,ProviderPort port;

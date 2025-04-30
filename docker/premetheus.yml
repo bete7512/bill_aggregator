@@ -1,0 +1,15 @@
+# docker/prometheus.yml
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: 'bill-aggregator'
+    static_configs:
+      - targets: ['app:8080']
+    metrics_path: '/metrics'
+
+  - job_name: 'mock-provider-api'
+    static_configs:
+      - targets: ['mock-provider-api:8081']
+    metrics_path: '/metrics'

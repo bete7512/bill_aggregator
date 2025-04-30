@@ -1,0 +1,82 @@
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool
+*.out
+*.prof
+*.cov
+
+# Dependency directories (remove the comment below if you don't use Go modules)
+# vendor/
+
+# Go workspace file
+go.work
+
+# Environment files
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+*.env
+
+# Binary output directories
+/bin/
+/dist/
+
+# IDE specific files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Debug files
+debug
+__debug_bin
+
+# Log files
+*.log
+logs/
+
+# Temporary files
+tmp/
+temp/
+
+# Database files
+*.db
+
+# Air live reload config
+.air.toml
+tmp/
+
+# Compiled Object files, Static and Dynamic libs
+*.o
+*.a
+
+# Configuration files with sensitive information
+config.yaml
+config.yml
+*config*.json
+!example-config.json
+!config.example.json
+
+# Generated files
+gen/
+generated/
+*.pb.go
+*.mock.go
+# swagger.
+# swagger.yaml
+
+# Docker files
+.dockerignore
+docker-compose.override.yml

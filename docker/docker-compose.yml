@@ -1,0 +1,90 @@
+
+# docker/docker-compose.yml
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: bill-aggregator
+    ports:
+      - "8080:8080"
+    environment:
+      - SERVER_ADDRESS=:8080
+      - DB_CONNECTION_STRING=postgres://postgres:postgres@db:5432/billaggregator?sslmode=disable
+      - DB_MAX_OPEN_CONNS=10
+      - DB_MAX_IDLE_CONNS=5
+      - DB_CONN_MAX_LIFETIME_SECS=300
+      - PROVIDER_API_BASE_URL=http://mock-provider-api:8081
+    depends_on:
+      - db
+      - mock-provider-api
+    restart: unless-stopped
+    networks:
+      - bill-aggregator-network
+
+  db:
+    image: postgres:14
+    container_name: bill-aggregator-db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=billaggregator
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ../migrations:/docker-entrypoint-initdb.d
+    restart: unless-stopped
+    networks:
+      - bill-aggregator-network
+
+  mock-provider-api:
+    build:
+      context: ../mock-provider-api
+      dockerfile: Dockerfile
+    container_name: mock-provider-api
+    ports:
+      - "8081:8081"
+    environment:
+      - PORT=8081
+    restart: unless-stopped
+    networks:
+      - bill-aggregator-network
+
+  prometheus:
+    image: prom/prometheus:v2.37.0
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    restart: unless-stopped
+    networks:
+      - bill-aggregator-network
+
+  grafana:
+    image: grafana/grafana:9.1.0
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana-data:/var/lib/grafana
+    restart: unless-stopped
+    networks:
+      - bill-aggregator-network
+
+networks:
+  bill-aggregator-network:
+    driver: bridge
+
+volumes:
+  postgres-data:
+  prometheus-data:
+  grafana-data:
+
